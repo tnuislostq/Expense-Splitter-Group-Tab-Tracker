@@ -2,119 +2,438 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>{{ tracker.group_name }} — Expense Splitter</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ tracker.group_name }} — TabMate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  body { font-family: system-ui, sans-serif; max-width: 780px; margin: 40px auto; padding: 0 16px; color: #1e2327; }
-  h1 { margin-bottom: 4px; }
-  h2 { margin-top: 32px; border-bottom: 2px solid #eee; padding-bottom: 6px; }
-  form { margin: 12px 0; padding: 14px; background: #f7f7f8; border-radius: 8px; }
-  label { display: block; margin: 8px 0 2px; font-size: 0.9em; }
-  input, select { width: 100%; padding: 6px; box-sizing: border-box; }
-  button { margin-top: 10px; padding: 8px 16px; background: #1e2327; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
-  .flash { background: #fff3cd; padding: 8px 12px; border-radius: 6px; margin: 8px 0; }
-  .owed { color: #1a7f37; }
-  .owes { color: #cf222e; }
-  table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-  td, th { text-align: left; padding: 6px 4px; border-bottom: 1px solid #eee; }
+  :root {
+    --bg: #E7ECFA;
+    --card: #FFFFFF;
+    --text: #2B2F3A;
+    --muted: #8A93A6;
+    --blue: #3A5BFF;
+    --blue-soft: #E7ECFF;
+    --purple: #8B5CF6;
+    --purple-soft: #F2EBFE;
+    --pink: #FF6B6B;
+    --pink-soft: #FFEAEA;
+    --amber: #F0A93C;
+    --amber-soft: #FFF3DA;
+    --green: #34B67A;
+    --green-soft: #E4F8ED;
+    --radius: 20px;
+    --shadow: 0 14px 34px rgba(43,47,58,0.08);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 32px 20px 70px;
+  }
+
+  .wrap { max-width: 760px; margin: 0 auto; }
+
+  h1, h2, h3, .wordmark { font-family: 'Baloo 2', sans-serif; }
+
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+  }
+  .wordmark {
+    font-weight: 700;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .wordmark .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--blue); display: inline-block; }
+  .topbar .meta { font-size: 0.82rem; color: var(--muted); text-align: right; }
+
+  .flash {
+    background: var(--amber-soft);
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 0.88rem;
+    margin-bottom: 14px;
+    color: #7a5518;
+  }
+
+  .hero {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 30px 30px 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  .hero-copy { flex: 1; }
+  .hero h1 { font-size: 1.6rem; margin: 0 0 6px; }
+  .hero p { margin: 0 0 16px; color: var(--muted); font-size: 0.92rem; }
+
+  .quick-links { display: flex; gap: 10px; flex-wrap: wrap; }
+  .quick-links a {
+    text-decoration: none;
+    color: var(--text);
+    background: var(--bg);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .quick-links a:hover { background: var(--blue-soft); color: var(--blue); }
+
+  .bear-wrap {
+    width: 130px; height: 130px;
+    border-radius: 50%;
+    background: var(--blue-soft);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--card);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 16px;
+  }
+  .stat-icon {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 10px;
+  }
+  .stat-card .label { font-size: 0.72rem; color: var(--muted); margin-bottom: 4px; }
+  .stat-card .value { font-weight: 700; font-size: 1.05rem; }
+
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px 26px;
+    margin-bottom: 18px;
+  }
+  .card h2 { font-size: 1.1rem; margin: 0 0 4px; }
+  .card .sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 14px; }
+
+  .balance-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #F0F2F8;
+  }
+  .balance-row:last-child { border-bottom: none; }
+  .who { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 0.8rem; color: #fff; flex-shrink: 0;
+  }
+  .status-owed { color: var(--green); font-weight: 600; font-size: 0.88rem; }
+  .status-owes { color: var(--pink); font-weight: 600; font-size: 0.88rem; }
+  .status-even { color: var(--muted); font-size: 0.88rem; }
+
+  .plan-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 9px 0;
+    font-size: 0.9rem;
+  }
+  .plan-row .arrow { color: var(--blue); margin: 0 6px; }
+  .plan-row .amt { font-weight: 600; }
+
+  .cat-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 0.85rem; color: var(--muted); }
+
+  label { display: block; font-size: 0.8rem; color: var(--muted); margin: 12px 0 4px; }
+  label:first-of-type { margin-top: 0; }
+  input, select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #E3E7F2;
+    border-radius: 12px;
+    background: #FAFBFE;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+  input:focus, select:focus { outline: none; border-color: var(--blue); background: #fff; }
+
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .chip-check {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--bg);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+  .chip-check input { width: auto; padding: 0; }
+
+  .member-strip { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .member-pill {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--bg);
+    border-radius: 999px;
+    padding: 4px 12px 4px 4px;
+    font-size: 0.82rem;
+  }
+
+  button {
+    margin-top: 16px;
+    padding: 10px 20px;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+  }
+  button:hover { background: #2c48e0; }
+
+  .inline-add { display: flex; gap: 10px; align-items: flex-end; }
+  .inline-add > div { flex: 1; }
+  .inline-add button { margin-top: 0; }
+
+  footer { text-align: center; font-size: 0.78rem; color: var(--muted); margin-top: 30px; }
+
+  @media (max-width: 560px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .hero { flex-direction: column; text-align: center; }
+    .quick-links { justify-content: center; }
+  }
 </style>
 </head>
 <body>
+<div class="wrap">
 
-<h1>{{ tracker.group_name }}</h1>
-<p>Currency: {{ tracker.currency }}</p>
+  <div class="topbar">
+    <div class="wordmark"><span class="dot"></span>TabMate</div>
+    <div class="meta">{{ tracker.group_name }}<br>{{ tracker.currency }} tracker</div>
+  </div>
 
-{% with messages = get_flashed_messages() %}
-  {% for m in messages %}
-    <div class="flash">{{ m }}</div>
-  {% endfor %}
-{% endwith %}
-
-<h2>Members</h2>
-<p>{{ tracker.members | join(", ") if tracker.members else "No members yet." }}</p>
-<form method="post" action="{{ url_for('add_member') }}">
-  <label>Add member</label>
-  <input type="text" name="name" placeholder="Name" required>
-  <button type="submit">Add member</button>
-</form>
-
-<h2>Balances</h2>
-<table>
-  {% for member, bal in balances.items() %}
-    <tr>
-      <td>{{ member }}</td>
-      {% if bal > 0.01 %}
-        <td class="owed">is owed {{ tracker.currency }}{{ "%.2f"|format(bal) }}</td>
-      {% elif bal < -0.01 %}
-        <td class="owes">owes {{ tracker.currency }}{{ "%.2f"|format(-bal) }}</td>
-      {% else %}
-        <td>all settled up</td>
-      {% endif %}
-    </tr>
-  {% endfor %}
-</table>
-
-<h2>Suggested Settlement Plan</h2>
-{% if plan %}
-  <table>
-    {% for debtor, creditor, amt in plan %}
-      <tr><td>{{ debtor }} → pays → {{ creditor }}</td><td>{{ tracker.currency }}{{ "%.2f"|format(amt) }}</td></tr>
+  {% with messages = get_flashed_messages() %}
+    {% for m in messages %}
+      <div class="flash">{{ m }}</div>
     {% endfor %}
-  </table>
-{% else %}
-  <p>Everyone is settled up.</p>
-{% endif %}
+  {% endwith %}
 
-<h2>Add an Expense</h2>
-<form method="post" action="{{ url_for('add_expense') }}">
-  <label>Description</label>
-  <input type="text" name="title" required>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-copy">
+      <h1>Hi! Let's settle up 👋</h1>
+      <p>
+        {{ tracker.members | length }} people, {{ stats.total_expenses_count }} expense(s) tracked so far.
+      </p>
+      <div class="quick-links">
+        <a href="#add-member">＋ Add member</a>
+        <a href="#add-expense">🧾 Add expense</a>
+        <a href="#settle-up">✓ Settle payment</a>
+      </div>
+    </div>
+    <div class="bear-wrap">
+      <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="50" cy="88" rx="26" ry="6" fill="#D9E0F7"/>
+        <circle cx="26" cy="28" r="11" fill="#F5F1E8"/>
+        <circle cx="74" cy="28" r="11" fill="#F5F1E8"/>
+        <circle cx="26" cy="28" r="5" fill="#F4B8C6"/>
+        <circle cx="74" cy="28" r="5" fill="#F4B8C6"/>
+        <ellipse cx="50" cy="48" rx="34" ry="30" fill="#FBF8F1"/>
+        <ellipse cx="50" cy="80" rx="30" ry="16" fill="#FBF8F1"/>
+        <circle cx="27" cy="66" r="8" fill="#FBF8F1"/>
+        <circle cx="73" cy="66" r="8" fill="#FBF8F1"/>
+        <ellipse cx="34" cy="55" rx="6" ry="4.5" fill="#F6C7D2" opacity="0.8"/>
+        <ellipse cx="66" cy="55" rx="6" ry="4.5" fill="#F6C7D2" opacity="0.8"/>
+        <ellipse cx="50" cy="52" rx="13" ry="10" fill="#FFFFFF"/>
+        <circle cx="40" cy="43" r="3.4" fill="#2B2F3A"/>
+        <circle cx="60" cy="43" r="3.4" fill="#2B2F3A"/>
+        <circle cx="41.2" cy="41.8" r="1" fill="#fff"/>
+        <circle cx="61.2" cy="41.8" r="1" fill="#fff"/>
+        <ellipse cx="50" cy="53" rx="4.5" ry="3.2" fill="#2B2F3A"/>
+        <path d="M45 58 Q50 62 55 58" stroke="#2B2F3A" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+        <circle cx="50" cy="80" r="9" fill="#F0A93C"/>
+        <text x="50" y="84" font-family="Baloo 2, sans-serif" font-size="10" fill="#fff" text-anchor="middle" font-weight="700">{{ tracker.currency }}</text>
+      </svg>
+    </div>
+  </div>
 
-  <label>Amount ({{ tracker.currency }})</label>
-  <input type="number" step="0.01" name="amount" required>
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-icon" style="background: var(--purple-soft);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 7a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" stroke="#8B5CF6" stroke-width="1.8"/><path d="M16 12h3" stroke="#8B5CF6" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </div>
+      <div class="label">Total spent</div>
+      <div class="value">{{ tracker.currency }}{{ "%.2f"|format(stats.total_spent) }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background: var(--pink-soft);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z" stroke="#FF6B6B" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="label">Expenses logged</div>
+      <div class="value">{{ stats.total_expenses_count }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background: var(--amber-soft);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.2" stroke="#F0A93C" stroke-width="1.8"/><path d="M5 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="#F0A93C" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </div>
+      <div class="label">Members</div>
+      <div class="value">{{ tracker.members | length }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background: var(--green-soft);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 15l5-5 4 4 7-7" stroke="#34B67A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="label">Payments to settle</div>
+      <div class="value">{{ plan | length }}</div>
+    </div>
+  </div>
 
-  <label>Paid by</label>
-  <select name="paid_by" required>
-    {% for m in tracker.members %}<option value="{{ m }}">{{ m }}</option>{% endfor %}
-  </select>
+  <!-- BALANCES -->
+  <div class="card">
+    <h2>Balances</h2>
+    <div class="sub">Who owes who, right now</div>
+    {% if balances %}
+      {% for member, bal in balances.items() %}
+        <div class="balance-row">
+          <div class="who">
+            <div class="avatar" style="background: #3A5BFF;">{{ member[0] | upper }}</div>
+            {{ member }}
+          </div>
+          {% if bal > 0.01 %}
+            <div class="status-owed">+{{ tracker.currency }}{{ "%.2f"|format(bal) }}</div>
+          {% elif bal < -0.01 %}
+            <div class="status-owes">−{{ tracker.currency }}{{ "%.2f"|format(-bal) }}</div>
+          {% else %}
+            <div class="status-even">all settled up</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% else %}
+      <p style="color: var(--muted); font-size: 0.9rem;">No members added yet.</p>
+    {% endif %}
+  </div>
 
-  <label>Category</label>
-  <input type="text" name="category" placeholder="Food, Travel, Stay...">
+  <!-- SETTLEMENT PLAN -->
+  {% if plan %}
+  <div class="card">
+    <h2>Suggested settlements</h2>
+    <div class="sub">The fewest payments to clear every balance</div>
+    {% for debtor, creditor, amt in plan %}
+      <div class="plan-row">
+        <span>{{ debtor }}<span class="arrow">→</span>{{ creditor }}</span>
+        <span class="amt">{{ tracker.currency }}{{ "%.2f"|format(amt) }}</span>
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
 
-  <label>Split between (leave all unchecked = split equally among everyone)</label>
-  {% for m in tracker.members %}
-    <label style="display:inline-block; width:auto; margin-right:12px;">
-      <input type="checkbox" name="participants" value="{{ m }}" style="width:auto;"> {{ m }}
-    </label>
-  {% endfor %}
+  <!-- CATEGORY SPENDING -->
+  {% if stats.category_spending %}
+  <div class="card">
+    <h2>Spending by category</h2>
+    {% for cat, amt in stats.category_spending.items() %}
+      <div class="cat-row"><span>{{ cat }}</span><span>{{ tracker.currency }}{{ "%.2f"|format(amt) }}</span></div>
+    {% endfor %}
+  </div>
+  {% endif %}
 
-  <button type="submit">Add expense (equal split)</button>
-</form>
+  <!-- ADD MEMBER -->
+  <div class="card" id="add-member">
+    <h2>Who's in</h2>
+    <div class="member-strip">
+      {% for m in tracker.members %}
+        <div class="member-pill">
+          <div class="avatar" style="width:20px;height:20px;font-size:0.65rem;background: #3A5BFF;">{{ m[0] | upper }}</div>
+          {{ m }}
+        </div>
+      {% else %}
+        <p style="color: var(--muted); font-size: 0.85rem;">No members in the group yet.</p>
+      {% endfor %}
+    </div>
+    <form class="inline-add" method="post" action="{{ url_for('add_member') }}">
+      <div>
+        <label>Add someone to the group</label>
+        <input type="text" name="name" placeholder="Name" required>
+      </div>
+      <button type="submit">Add</button>
+    </form>
+  </div>
 
-<h2>Record a Settlement</h2>
-<form method="post" action="{{ url_for('settle') }}">
-  <label>From (who paid)</label>
-  <select name="from_user" required>
-    {% for m in tracker.members %}<option value="{{ m }}">{{ m }}</option>{% endfor %}
-  </select>
+  <!-- ADD EXPENSE -->
+  <div class="card" id="add-expense">
+    <h2>Log an expense</h2>
+    <form method="post" action="{{ url_for('add_expense') }}">
+      <label>What was it for?</label>
+      <input type="text" name="title" placeholder="e.g. Dinner, cab, tickets" required>
 
-  <label>To (who received)</label>
-  <select name="to_user" required>
-    {% for m in tracker.members %}<option value="{{ m }}">{{ m }}</option>{% endfor %}
-  </select>
+      <label>Amount ({{ tracker.currency }})</label>
+      <input type="number" step="0.01" name="amount" required>
 
-  <label>Amount ({{ tracker.currency }})</label>
-  <input type="number" step="0.01" name="amount" required>
+      <label>Who paid?</label>
+      <select name="paid_by" required>
+        {% for m in tracker.members %}
+          <option value="{{ m }}">{{ m }}</option>
+        {% endfor %}
+      </select>
 
-  <button type="submit">Record settlement</button>
-</form>
+      <label>Category</label>
+      <input type="text" name="category" placeholder="Food, Travel, Stay...">
 
-<h2>Analytics</h2>
-<p>Total spent: {{ tracker.currency }}{{ "%.2f"|format(stats.total_spent) }} across {{ stats.total_expenses_count }} expense(s)</p>
-<table>
-  {% for cat, amt in stats.category_spending.items() %}
-    <tr><td>{{ cat }}</td><td>{{ tracker.currency }}{{ "%.2f"|format(amt) }}</td></tr>
-  {% endfor %}
-</table>
+      <label>Split between (leave all unchecked to split equally among everyone)</label>
+      <div class="chip-row">
+        {% for m in tracker.members %}
+          <label class="chip-check"><input type="checkbox" name="participants" value="{{ m }}"> {{ m }}</label>
+        {% endfor %}
+      </div>
 
+      <button type="submit">Add to the tab</button>
+    </form>
+  </div>
+
+  <!-- SETTLE -->
+  <div class="card" id="settle-up">
+    <h2>Record a payment</h2>
+    <form method="post" action="{{ url_for('settle') }}">
+      <label>Who paid up?</label>
+      <select name="from_user" required>
+        {% for m in tracker.members %}
+          <option value="{{ m }}">{{ m }}</option>
+        {% endfor %}
+      </select>
+
+      <label>Who received it?</label>
+      <select name="to_user" required>
+        {% for m in tracker.members %}
+          <option value="{{ m }}">{{ m }}</option>
+        {% endfor %}
+      </select>
+
+      <label>Amount ({{ tracker.currency }})</label>
+      <input type="number" step="0.01" name="amount" required>
+
+      <button type="submit">Record settlement</button>
+    </form>
+  </div>
+
+  <footer>TabMate · group expense tracker · built by tanu</footer>
+
+</div>
 </body>
 </html>
